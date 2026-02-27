@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planter Box Gate — Step-by-Step 3D Build Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background:#141416; color:#e0dcd7;
+    font-family:'DM Sans',system-ui,sans-serif;
+    overflow:hidden; height:100vh;
+    display:flex;
+  }
+
+  /* ── LEFT PANEL ── */
+  #panel {
+    width:380px; min-width:380px; height:100vh;
+    background:#1a1a1e;
+    border-right:1px solid rgba(255,255,255,0.06);
+    display:flex; flex-direction:column;
+    overflow:hidden;
+    z-index:20;
+  }
+
+  #panel-header {
+    padding:20px 24px 16px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+    flex-shrink:0;
+  }
+  #panel-header h1 {
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px; font-weight:600;
+    color:#c8b89a; letter-spacing:1.5px;
+    text-transform:uppercase;
+  }
+  #panel-header p {
+    font-size:12px; color:#6a6660; margin-top:4px;
+  }
+
+  #step-counter {
+    padding:16px 24px 12px;
+    flex-shrink:0;
+  }
+  #step-counter .step-num {
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; color:#6a6660;
+    text-transform:uppercase; letter-spacing:1px;
+  }
+  #step-counter h2 {
+    font-size:22px; font-weight:700;
+    color:#e8e4df; margin-top:6px;
+    line-height:1.2;
+  }
+  #step-counter .step-sub {
+    font-size:13px; color:#8a8580; margin-top:4px;
+  }
+
+  /* progress bar */
+  #progress-track {
+    height:2px; background:rgba(255,255,255,0.06);
+    margin:0 24px; flex-shrink:0;
+  }
+  #progress-bar {
+    height:100%; background:#c8b89a;
+    transition:width 0.5s ease;
+  }
+
+  #step-body {
+    flex:1; overflow-y:auto; padding:16px 24px 24px;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(200,184,154,0.2) transparent;
+  }
+  #step-body::-webkit-scrollbar { width:4px; }
+  #step-body::-webkit-scrollbar-thumb { background:rgba(200,184,154,0.2); border-radius:2px; }
+
+  .section { margin-bottom:18px; }
+  .section-title {
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px; font-weight:600;
+    color:#6a6660; text-transform:uppercase;
+    letter-spacing:1.2px; margin-bottom:8px;
+  }
+
+  .materials-list, .instructions-list, .tools-list {
+    list-style:none; padding:0;
+  }
+  .materials-list li, .tools-list li {
+    font-size:13px; color:#a8a4a0;
+    padding:3px 0; display:flex; align-items:baseline; gap:8px;
+  }
+  .materials-list li::before { content:''; display:inline-block; width:6px; height:6px; background:#c8b89a; border-radius:1px; flex-shrink:0; margin-top:4px; }
+  .tools-list li::before { content:''; display:inline-block; width:6px; height:6px; border:1px solid #6a6660; border-radius:1px; flex-shrink:0; margin-top:4px; }
+
+  .instructions-list li {
+    font-size:13px; color:#c8c4c0;
+    padding:5px 0; display:flex; gap:10px;
+    line-height:1.5;
+  }
+  .instructions-list .num {
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; color:#c8b89a;
+    min-width:18px; text-align:right;
+    flex-shrink:0; padding-top:1px;
+  }
+
+  .tip-box {
+    background:rgba(200,184,154,0.06);
+    border:1px solid rgba(200,184,154,0.12);
+    border-radius:6px; padding:10px 14px;
+    font-size:12px; color:#a8a090; line-height:1.5;
+  }
+  .tip-box strong { color:#c8b89a; font-weight:600; }
+
+  /* ── NAVIGATION ── */
+  #nav {
+    padding:16px 24px;
+    border-top:1px solid rgba(255,255,255,0.06);
+    display:flex; gap:10px; flex-shrink:0;
+  }
+  .nav-btn {
+    flex:1; padding:10px 16px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    color:#c8b89a; font-family:'JetBrains Mono',monospace;
+    font-size:12px; font-weight:500;
+    border-radius:6px; cursor:pointer;
+    transition:all 0.2s;
+  }
+  .nav-btn:hover:not(:disabled) {
+    background:rgba(200,184,154,0.12);
+    border-color:rgba(200,184,154,0.25);
+  }
+  .nav-btn:disabled { opacity:0.25; cursor:default; }
+  .nav-btn.primary {
+    background:rgba(200,184,154,0.15);
+    border-color:rgba(200,184,154,0.3);
+    color:#fff;
+  }
+
+  /* ── VIEWPORT ── */
+  #viewport {
+    flex:1; position:relative; overflow:hidden;
+  }
+  #viewport canvas { display:block; }
+
+  #vp-controls {
+    position:absolute; top:16px; right:16px;
+    display:flex; gap:6px; z-index:10;
+  }
+  .vp-btn {
+    background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1);
+    color:#a8a4a0; font-family:'JetBrains Mono',monospace;
+    font-size:10px; padding:6px 12px; border-radius:4px;
+    cursor:pointer; transition:all 0.2s;
+    backdrop-filter:blur(10px);
+  }
+  .vp-btn:hover { background:rgba(200,184,154,0.15); color:#e0dcd7; border-color:rgba(200,184,154,0.3); }
+  .vp-btn.active { border-color:#c8b89a; color:#c8b89a; }
+
+  #vp-hint {
+    position:absolute; bottom:16px; right:16px;
+    font-size:11px; color:#4a4640; z-index:10;
+    pointer-events:none; text-align:right; line-height:1.6;
+  }
+
+  /* Tooltip */
+  #tooltip {
+    position:absolute; display:none;
+    background:rgba(20,20,22,0.95); border:1px solid rgba(200,184,154,0.3);
+    border-radius:6px; padding:8px 12px;
+    pointer-events:none; backdrop-filter:blur(10px);
+    max-width:240px; z-index:100;
+    box-shadow:0 8px 32px rgba(0,0,0,0.6);
+  }
+  #tooltip .tt-name { font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; color:#c8b89a; text-transform:uppercase; letter-spacing:0.5px; }
+  #tooltip .tt-dim { font-family:'JetBrains Mono',monospace; font-size:10px; color:#6a6660; margin-top:2px; }
+
+  /* Step dots */
+  #step-dots {
+    display:flex; gap:4px; justify-content:center;
+    padding:0 24px 4px;
+    flex-shrink:0;
+  }
+  .dot {
+    width:8px; height:8px; border-radius:2px;
+    background:rgba(255,255,255,0.08);
+    cursor:pointer; transition:all 0.3s;
+  }
+  .dot:hover { background:rgba(200,184,154,0.3); }
+  .dot.done { background:rgba(200,184,154,0.25); }
+  .dot.active { background:#c8b89a; width:20px; }
+</style>
+</head>
+<body>
+
+<div id="panel">
+  <div id="panel-header">
+    <h1>Planter Box Gate</h1>
+    <p>Step-by-step 3D build guide &mdash; 120cm planter gate for toddler safety</p>
+  </div>
+
+  <div id="step-counter">
+    <div class="step-num" id="step-num-label">Step 1 of 11</div>
+    <h2 id="step-title">Foundation Slabs</h2>
+    <div class="step-sub" id="step-subtitle">Level base for the planter boxes</div>
+  </div>
+
+  <div id="progress-track"><div id="progress-bar" style="width:0%"></div></div>
+
+  <div id="step-body"></div>
+
+  <div id="step-dots"></div>
+
+  <div id="nav">
+    <button class="nav-btn" id="btn-prev" onclick="prevStep()" disabled>&larr; Back</button>
+    <button class="nav-btn primary" id="btn-next" onclick="nextStep()">Next &rarr;</button>
+  </div>
+</div>
+
+<div id="viewport">
+  <div id="vp-controls">
+    <button class="vp-btn" onclick="resetCamera()">Reset View</button>
+    <button class="vp-btn" id="btn-autoplay" onclick="toggleAutoplay()">Auto-Play</button>
+    <button class="vp-btn" id="btn-ghost" onclick="toggleGhost()">Ghost: OFF</button>
+  </div>
+  <div id="tooltip">
+    <div class="tt-name"></div>
+    <div class="tt-dim"></div>
+  </div>
+  <div id="vp-hint">Drag to rotate &middot; Scroll to zoom &middot; Hover for part info</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ============================================================
+// CONSTANTS — matches the real shopping list exactly
+// ============================================================
+const PW = 0.045, PD = 0.095;           // post cross-section
+const BOX_W = 0.40, BOX_D = 0.40;       // planter box footprint
+const BOX_H = 1.20;                      // 120cm tall
+const SHELF_Y = 0.60;                    // shelf at 60cm
+const CLAD_T = 0.016, CLAD_W = 0.10;    // cladding 16×100mm
+const SHELF_T = 0.015, SHELF_W = 0.095; // shelf board 15×95mm
+const SLAB_W = 0.40, SLAB_D = 0.40, SLAB_H = 0.06; // betonflise
+const GATE_W = 1.16, GATE_H = 1.18;     // gate slightly smaller than opening
+const PICKET_T = 0.016, PICKET_W = 0.10;// gate pickets 16×100mm
+const N_PICKETS = 14;
+const PLANTER_X = 0.80;                  // planter center offset from origin
+
+// ============================================================
+// SCENE SETUP
+// ============================================================
+const viewport = document.getElementById('viewport');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x141416);
+scene.fog = new THREE.Fog(0x141416, 10, 25);
+
+const camera = new THREE.PerspectiveCamera(42, 1, 0.01, 100);
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+viewport.appendChild(renderer.domElement);
+
+// Lights
+scene.add(new THREE.AmbientLight(0xffeedd, 0.35));
+const sun = new THREE.DirectionalLight(0xfff5e0, 1.3);
+sun.position.set(5, 8, 4); sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.near = 0.1; sun.shadow.camera.far = 20;
+sun.shadow.camera.left = -5; sun.shadow.camera.right = 5;
+sun.shadow.camera.top = 5; sun.shadow.camera.bottom = -5;
+scene.add(sun);
+const fill = new THREE.DirectionalLight(0xc0d0ff, 0.25);
+fill.position.set(-3, 4, -2); scene.add(fill);
+const rim = new THREE.PointLight(0xffddaa, 0.4, 10);
+rim.position.set(-2, 3, 3); scene.add(rim);
+
+// Ground
+const gnd = new THREE.Mesh(
+  new THREE.PlaneGeometry(20, 20),
+  new THREE.MeshStandardMaterial({ color:0x22222a, roughness:0.95 })
+);
+gnd.rotation.x = -Math.PI/2; gnd.position.y = -0.005;
+gnd.receiveShadow = true; scene.add(gnd);
+const grid = new THREE.GridHelper(8, 40, 0x2a2a30, 0x222228);
+scene.add(grid);
+
+// ============================================================
+// MATERIALS
+// ============================================================
+const MAT = {
+  timber:    new THREE.MeshStandardMaterial({ color:0x8B7355, roughness:0.72 }),
+  timberLt:  new THREE.MeshStandardMaterial({ color:0x9B8665, roughness:0.70 }),
+  timberDk:  new THREE.MeshStandardMaterial({ color:0x6B5B45, roughness:0.78 }),
+  clad:      new THREE.MeshStandardMaterial({ color:0x9B8365, roughness:0.68 }),
+  shelf:     new THREE.MeshStandardMaterial({ color:0xA08B6B, roughness:0.70 }),
+  concrete:  new THREE.MeshStandardMaterial({ color:0x8a8a88, roughness:0.90, metalness:0.05 }),
+  soil:      new THREE.MeshStandardMaterial({ color:0x4A3728, roughness:0.95 }),
+  liner:     new THREE.MeshStandardMaterial({ color:0x1a1a1a, roughness:0.4, transparent:true, opacity:0.45 }),
+  metal:     new THREE.MeshStandardMaterial({ color:0xB0B0B0, roughness:0.30, metalness:0.75 }),
+  metalDk:   new THREE.MeshStandardMaterial({ color:0x808080, roughness:0.35, metalness:0.65 }),
+  wire:      new THREE.MeshStandardMaterial({ color:0x999999, roughness:0.3, metalness:0.8 }),
+  spike:     new THREE.MeshStandardMaterial({ color:0x707070, roughness:0.4, metalness:0.7 }),
+  highlight: new THREE.MeshStandardMaterial({ color:0xeebb55, roughness:0.5, emissive:0x443300, emissiveIntensity:0.4 }),
+  ghost:     new THREE.MeshStandardMaterial({ color:0x555555, roughness:0.8, transparent:true, opacity:0.08, depthWrite:false }),
+};
+
+// Dimmed clones for previous-step parts
+const dimCache = new Map();
+function getDimMat(mat) {
+  if (dimCache.has(mat)) return dimCache.get(mat);
+  const d = mat.clone();
+  d.transparent = true;
+  d.opacity = Math.min(mat.opacity || 1, 0.45);
+  d.emissive = new THREE.Color(0x000000);
+  d.emissiveIntensity = 0;
+  dimCache.set(mat, d);
+  return d;
+}
+
+// ============================================================
+// STEP DEFINITIONS
+// ============================================================
+const STEPS = [
+  {
+    title: "Place Foundation Slabs",
+    subtitle: "Level base for the planter boxes",
+    materials: [
+      "4x Betonflise 40x40x6cm (base slabs)",
+    ],
+    tools: ["Spirit level", "Rubber mallet", "Spade (to level ground)"],
+    instructions: [
+      "Choose your location. You need a flat area about 2.5m wide and 1m deep.",
+      "Scrape the ground level where each planter will stand. Use a spirit level across the area.",
+      "Place 2 concrete slabs side by side under each planter position, creating a 80x40cm base. This wider base improves stability.",
+      "Check all 4 slabs are level with each other. Tap down with a rubber mallet as needed.",
+    ],
+    tips: "The slabs raise the wood off wet ground, preventing rot. A wider base (2 slabs per planter) means better stability against tipping.",
+    camera: { theta:0.8, phi:1.35, radius:5.5, lookY:0.1 },
+  },
+  {
+    title: "Raise Corner Posts",
+    subtitle: "8 posts form the skeleton of both planters",
+    materials: [
+      "8x Reglar 45x95mm cut to 1200mm (from 4x 2400mm boards)",
+    ],
+    tools: ["Mitre saw or hand saw", "Measuring tape", "Pencil", "Speed square"],
+    instructions: [
+      "Cut 4 reglar boards in half: each 2400mm board yields 2x 1200mm posts. Zero waste!",
+      "Stand 4 posts on each planter base slab, at the corners of a 400x400mm square.",
+      "Orient posts with the 95mm face front-to-back (depth direction) and 45mm face side-to-side. This gives the gate hinges a wide mounting surface.",
+      "Use a spirit level to check each post is plumb. Temporarily clamp or have someone hold them.",
+    ],
+    tips: "Don't fix the posts yet — the rails in the next step will lock everything together. Just get them roughly positioned and plumb.",
+    camera: { theta:0.6, phi:1.0, radius:5.0, lookY:0.5 },
+  },
+  {
+    title: "Connect Horizontal Rails",
+    subtitle: "3 levels of rails lock the frame together",
+    materials: [
+      "22x Reglar 45x95mm cut to ~310mm (width rails) and ~210mm (depth rails)",
+      "1x Skruer rustfri 4.5x50mm box (structural)",
+      "8x Vinkelbeslag 40x40mm (corner brackets)",
+    ],
+    tools: ["Drill/driver", "TX25 bit", "Speed square", "Clamps"],
+    instructions: [
+      "Cut rails from remaining reglar: width rails are ~310mm (400 - 2x45mm), depth rails are ~210mm (400 - 2x95mm).",
+      "Install rails at 3 heights: bottom (45mm up), shelf level (600mm), and top (1155mm). That's 4 rails per level (2 front/back + 2 sides) x 3 levels x 2 planters = 24 rails.",
+      "Pre-drill and screw each rail into the posts using 4.5x50mm structural screws, 2 screws per joint.",
+      "Add vinkelbeslag (angle brackets) at the top corners for extra rigidity. 4 brackets per planter = 8 total.",
+      "Check the frame is square by measuring diagonals — they should be equal.",
+    ],
+    tips: "Start with the bottom rails to lock the post spacing, then work upwards. The shelf-level rails will support the platform boards later.",
+    camera: { theta:0.5, phi:1.05, radius:4.8, lookY:0.55 },
+  },
+  {
+    title: "Lay Shelf Boards",
+    subtitle: "Internal platform at 60cm with drainage",
+    materials: [
+      "6x Forskallingsbrt 15x95mm cut to ~310mm (from 2x 1800mm boards)",
+    ],
+    tools: ["Drill/driver", "5mm drill bit (drainage holes)", "TX20 bit"],
+    instructions: [
+      "Cut 2 forskallingsbrt boards into 6 pieces of ~310mm each. These rest on the shelf-level rails.",
+      "Drill 4-5 drainage holes (5mm) in each board before installing. Water must be able to drain through to the ballast below.",
+      "Lay 3 boards per planter across the shelf-level rails, evenly spaced. Screw down with 4.0x40mm screws.",
+    ],
+    tips: "The shelf creates two zones: below it holds ballast weight, above it holds soil for planting. Drainage holes are critical so roots don't sit in water!",
+    camera: { theta:0.3, phi:0.85, radius:3.5, lookY:0.55 },
+  },
+  {
+    title: "Attach Cladding Boards",
+    subtitle: "16x100mm boards cover all four sides",
+    materials: [
+      "24x Hegnsbrdder 16x100mm cut to 1200mm (from 1800mm boards)",
+      "1x Skruer rustfri 4.0x40mm box",
+    ],
+    tools: ["Drill/driver", "TX20 bit", "Spacer block for even gaps"],
+    instructions: [
+      "Cut each 1800mm board to 1200mm. You get one cladding board per stock board (600mm offcut — save for other projects).",
+      "Starting at one corner, screw the first board flush with the post edge using 4.0x40mm screws. Two screws per rail crossing (top, middle, bottom = 6 screws per board).",
+      "Work around all 4 faces of each planter: 3 boards per face x 4 faces x 2 planters = 24 boards total.",
+      "Keep boards tight together for a clean look. The boards are rough-sawn (ru) so small gaps are normal.",
+    ],
+    tips: "Cladding transforms the skeleton into solid planter boxes. Pre-drill near board ends to avoid splitting. Leave the top open — that's where the soil goes!",
+    camera: { theta:0.7, phi:1.05, radius:5.2, lookY:0.55 },
+  },
+  {
+    title: "Line with Plastic & Add Ballast",
+    subtitle: "Waterproof liner above shelf + concrete weight below",
+    materials: [
+      "1x Plastfolie 0.2mm roll (cut to fit)",
+      "4x Betonflise 40x40x6cm (ballast slabs, ~30kg each)",
+    ],
+    tools: ["Scissors or utility knife", "Staple gun"],
+    instructions: [
+      "First, lower 2 concrete slabs into each planter box, resting on the bottom below the shelf boards. These add ~30kg of ballast per planter to prevent tipping.",
+      "Cut plastfolie to line the inside of each planter ABOVE the shelf. Fold it like a box liner, bringing it up the walls about 40cm.",
+      "Staple the liner to the inside of the posts/rails. The liner keeps moist soil away from the wood, greatly extending its life.",
+      "Poke a few small drainage holes through the liner where it sits on the shelf boards — water needs to drain down.",
+    ],
+    tips: "The combination of below-shelf ballast (~60kg total) and soil above (~40kg total) makes the planters very stable. That's ~50kg per box!",
+    camera: { theta:0.2, phi:0.80, radius:3.8, lookY:0.5 },
+  },
+  {
+    title: "Secure with Ground Anchors",
+    subtitle: "Ground spikes prevent any chance of tipping",
+    materials: [
+      "4x Jordanker / ground spike ~40cm",
+      "1x Steel wire 2mm or ratchet straps",
+    ],
+    tools: ["Hammer or mallet", "Wire cutters", "Pliers"],
+    instructions: [
+      "Drive one ground spike into the soil near each planter, about 20cm away from the planter base on the outside.",
+      "Loop steel wire from each spike, up through or around the planter frame rail, and secure tightly.",
+      "Alternatively, use ratchet straps if you already own them — they're quicker and adjustable.",
+      "Test stability by pushing firmly against each planter. It should feel rock solid.",
+    ],
+    tips: "With ~50kg of weight per planter PLUS ground anchors, these boxes aren't going anywhere. This is important for gate safety — the gate's leverage force acts on the planter.",
+    camera: { theta:1.0, phi:1.25, radius:5.0, lookY:0.25 },
+  },
+  {
+    title: "Build the Gate Frame",
+    subtitle: "Assemble stiles, rails, and the critical Z-brace",
+    materials: [
+      "2x Reglar 45x95mm cut to 1180mm (stiles)",
+      "2x Reglar 45x95mm cut to ~1070mm (rails)",
+      "1x Reglar 45x95mm cut to ~1600mm (diagonal brace)",
+    ],
+    tools: ["Mitre saw", "Drill/driver", "Speed square", "Large flat surface"],
+    instructions: [
+      "Cut 2 vertical stiles to 1180mm (gate height with 20mm ground clearance).",
+      "Cut 2 horizontal rails to fit between the stiles: ~1160 - 2x45mm = ~1070mm.",
+      "Lay the stiles on a flat surface and connect with the top and bottom rails using 4.5x50mm screws. Check for square!",
+      "Measure and cut a diagonal Z-brace from the bottom-hinge corner to the top-latch corner. This is CRITICAL for a wide gate — without it, the gate will sag.",
+      "The brace should run from the bottom of the hinge side to the top of the latch side. This puts the brace in compression when the gate hangs.",
+    ],
+    tips: "The Z-brace is the most important structural element. A 1.2m wide gate WILL sag without it. Make sure the brace runs from the bottom hinge corner upward to the latch side.",
+    camera: { theta:-0.2, phi:1.15, radius:4.5, lookY:0.55 },
+  },
+  {
+    title: "Add Gate Pickets",
+    subtitle: "14 boards with toddler-safe spacing",
+    materials: [
+      "14x Hegnsbrdder 16x100mm cut to 1180mm",
+      "Skruer rustfri 4.0x40mm",
+    ],
+    tools: ["Drill/driver", "TX20 bit", "Spacing jig (~50mm)"],
+    instructions: [
+      "Cut 14 boards to 1180mm from 1800mm stock. These are the same boards used for cladding.",
+      "Calculate spacing: gate width between stiles (~1070mm) / 14 pickets. Each picket is 100mm wide, so total picket width = 1400mm. Available space for gaps = 1070 - 1400... Hmm, the pickets overlap the rails slightly.",
+      "Screw each picket to the front face of the frame (covering the top and bottom rails) with 4.0x40mm screws. 2 screws at each rail = 4 per picket.",
+      "Use a ~50mm spacer block between pickets for consistent gaps. Maximum 50mm gap = toddler safe (can't fit a head through).",
+    ],
+    tips: "The picket gaps must be under 60mm (toddler head width). At ~50mm gaps with 14 pickets, you're safely within the limit. Check with a measuring tape!",
+    camera: { theta:-0.1, phi:1.05, radius:4.0, lookY:0.55 },
+  },
+  {
+    title: "Hang Gate & Fit Hardware",
+    subtitle: "Hinges, thumb latch, and slide bolt",
+    materials: [
+      "3x T-hngsel 300mm galvaniseret",
+      "1x Stalddorsgreb (thumb latch)",
+      "1x Skudrigle 150mm (slide bolt)",
+    ],
+    tools: ["Drill/driver", "Screws (included with hardware)", "Spirit level", "Helper (to hold gate)"],
+    instructions: [
+      "Mount the 3 T-hinges on the gate first: one near the top, one near the bottom, one in the middle. The long arm goes across the pickets, the short pin-side mounts to the planter post.",
+      "Have someone hold the gate in position between the planters. Use 20mm spacer blocks under the gate for ground clearance.",
+      "Screw the hinge pins into the inner face of the left planter's front post. Check the gate swings freely.",
+      "Mount the stalddorsgreb (thumb latch) at adult height (~1m from ground) on the latch side. This should be out of a toddler's reach.",
+      "Mount the skudrigle (slide bolt) at the bottom of the gate (~80mm up) for a second toddler-proof lock. Adults slide it with their foot.",
+    ],
+    tips: "Three hinges are essential for a 1.2m wide gate — two would allow the gate to sag over time. Mount the latch as high as practical to keep it out of Arthur's reach!",
+    camera: { theta:0.0, phi:1.05, radius:4.5, lookY:0.55 },
+  },
+  {
+    title: "Fill with Soil & Plant!",
+    subtitle: "Add potting soil and bring it to life",
+    materials: [
+      "2x Plantejord 40L bags",
+      "Plants: herbs, strawberries, or flowers",
+    ],
+    tools: ["Trowel or hands", "Watering can"],
+    instructions: [
+      "Pour one 40L bag of plantejord into each planter, filling above the liner to about 10cm from the top.",
+      "Leave a 10cm gap at the top to prevent soil washing over when watering.",
+      "Plant your herbs, strawberries, or flowers. Great options: lavender, rosemary, thyme, mint, wild strawberries.",
+      "Water thoroughly and step back to admire your work!",
+    ],
+    tips: "You've built a 120cm tall toddler-safe gate with integrated planter boxes! The planters add beauty, weight for stability, and a reason to go outside. Arthur stays safe, and you get fresh herbs.",
+    camera: { theta:0.6, phi:0.95, radius:6.0, lookY:0.55 },
+  },
+];
+
+// ============================================================
+// GEOMETRY BUILDERS — one group per step
+// ============================================================
+const stepGroups = [];
+const allMeshes = [];
+
+function mkBox(w, h, d, mat) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+  m.castShadow = true; m.receiveShadow = true;
+  return m;
+}
+
+function reg(mesh, name, dim, fromDir) {
+  mesh.userData = {
+    name, dim,
+    baseMat: mesh.material,
+    finalPos: mesh.position.clone(),
+    fromOffset: fromDir || new THREE.Vector3(0, 0.5, 0),
+    animT: 1, // starts "placed"
+  };
+  allMeshes.push(mesh);
+  return mesh;
+}
+
+// Helper: build a planter for a given side (-1 = left, +1 = right)
+function buildPlanterFoundation(cx) {
+  const g = new THREE.Group();
+  // 2 slabs side by side under each planter
+  for (let i = 0; i < 2; i++) {
+    const slab = mkBox(SLAB_W, SLAB_H, SLAB_D, MAT.concrete);
+    slab.position.set(cx + (i - 0.5) * SLAB_W, SLAB_H / 2, 0);
+    g.add(reg(slab, 'Foundation Slab', '40x40x6cm concrete', new THREE.Vector3(0, -0.3, 0)));
+  }
+  return g;
+}
+
+function buildPlanterPosts(cx) {
+  const g = new THREE.Group();
+  const baseY = SLAB_H;
+  for (let xi = 0; xi < 2; xi++) for (let zi = 0; zi < 2; zi++) {
+    const post = mkBox(PW, BOX_H, PD, MAT.timber);
+    post.position.set(
+      cx + (xi ? BOX_W/2 - PW/2 : -BOX_W/2 + PW/2),
+      baseY + BOX_H/2,
+      zi ? BOX_D/2 - PD/2 : -BOX_D/2 + PD/2
+    );
+    g.add(reg(post, 'Corner Post', '45x95x1200mm reglar', new THREE.Vector3(0, 0.8, 0)));
+  }
+  return g;
+}
+
+function buildPlanterRails(cx) {
+  const g = new THREE.Group();
+  const baseY = SLAB_H;
+  const levels = [
+    { y: baseY + PW/2, n: 'Bottom Rail' },
+    { y: baseY + SHELF_Y, n: 'Shelf Rail' },
+    { y: baseY + BOX_H - PW/2, n: 'Top Rail' },
+  ];
+  levels.forEach(lv => {
+    // Width-direction rails (front & back)
+    const wLen = BOX_W - 2 * PW;
+    for (let zi = 0; zi < 2; zi++) {
+      const rail = mkBox(wLen, PW, PD, MAT.timberDk);
+      rail.position.set(cx, lv.y, zi ? BOX_D/2 - PD/2 : -BOX_D/2 + PD/2);
+      g.add(reg(rail, lv.n, `45x95x${Math.round(wLen*1000)}mm`, new THREE.Vector3(0, 0, zi ? 0.5 : -0.5)));
+    }
+    // Depth-direction rails (sides)
+    const dLen = BOX_D - 2 * PD;
+    for (let xi = 0; xi < 2; xi++) {
+      const rail = mkBox(PW, PW, dLen, MAT.timberDk);
+      rail.position.set(cx + (xi ? BOX_W/2 - PW/2 : -BOX_W/2 + PW/2), lv.y, 0);
+      g.add(reg(rail, lv.n, `45x95x${Math.round(dLen*1000)}mm`, new THREE.Vector3(xi ? 0.5 : -0.5, 0, 0)));
+    }
+  });
+  // Angle brackets at top corners
+  for (let xi = 0; xi < 2; xi++) for (let zi = 0; zi < 2; zi++) {
+    const brk = mkBox(0.04, 0.04, 0.015, MAT.metal);
+    brk.position.set(
+      cx + (xi ? BOX_W/2 - 0.03 : -BOX_W/2 + 0.03),
+      baseY + BOX_H - 0.04,
+      zi ? BOX_D/2 - 0.04 : -BOX_D/2 + 0.04
+    );
+    g.add(reg(brk, 'Angle Bracket', '40x40mm vinkelbeslag', new THREE.Vector3(0, 0.3, 0)));
+  }
+  return g;
+}
+
+function buildPlanterShelf(cx) {
+  const g = new THREE.Group();
+  const baseY = SLAB_H;
+  const bLen = BOX_W - 2 * PW - 0.01;
+  const bWid = (BOX_D - 2 * PD - 0.01) / 3;
+  for (let i = 0; i < 3; i++) {
+    const board = mkBox(bLen, SHELF_T, bWid - 0.004, MAT.shelf);
+    board.position.set(
+      cx,
+      baseY + SHELF_Y + SHELF_T/2,
+      -BOX_D/2 + PD + bWid/2 + 0.005 + i * bWid
+    );
+    g.add(reg(board, 'Shelf Board', '15x95x~310mm', new THREE.Vector3(0, 0.4, 0)));
+  }
+  return g;
+}
+
+function buildPlanterCladding(cx) {
+  const g = new THREE.Group();
+  const baseY = SLAB_H;
+  // 4 faces, 3 boards each
+  const faces = [
+    { axis:'x', dir:-1, label:'Front' },
+    { axis:'x', dir: 1, label:'Back' },
+    { axis:'z', dir:-1, label:'Left Side' },
+    { axis:'z', dir: 1, label:'Right Side' },
+  ];
+  faces.forEach(f => {
+    for (let i = 0; i < 3; i++) {
+      let geo, px, pz, fromOff;
+      const py = baseY + BOX_H/2;
+      if (f.axis === 'x') {
+        const bLen = BOX_D - 0.005;
+        geo = new THREE.BoxGeometry(CLAD_T, BOX_H, bLen/3 - 0.003);
+        px = cx + f.dir * (BOX_W/2 + CLAD_T/2);
+        pz = -bLen/2 + (bLen/3) * (i + 0.5);
+        fromOff = new THREE.Vector3(f.dir * 0.5, 0, 0);
+      } else {
+        const bLen = BOX_W + CLAD_T * 2;
+        geo = new THREE.BoxGeometry(bLen/3 - 0.003, BOX_H, CLAD_T);
+        pz = f.dir * (BOX_D/2 + CLAD_T/2);
+        px = cx - bLen/2 + (bLen/3) * (i + 0.5);
+        fromOff = new THREE.Vector3(0, 0, f.dir * 0.5);
+      }
+      const m = new THREE.Mesh(geo, MAT.clad);
+      m.position.set(px, py, pz);
+      m.castShadow = true; m.receiveShadow = true;
+      g.add(reg(m, `Cladding (${f.label})`, '16x100x1200mm', fromOff));
+    }
+  });
+  return g;
+}
+
+function buildPlanterLinerBallast(cx) {
+  const g = new THREE.Group();
+  const baseY = SLAB_H;
+  // Ballast slabs inside (below shelf)
+  for (let i = 0; i < 2; i++) {
+    const slab = mkBox(BOX_W - 2*PW - 0.02, SLAB_H, (BOX_D - 2*PD - 0.02)/2 - 0.005, MAT.concrete);
+    slab.position.set(cx, baseY + SLAB_H/2 + 0.01, (i - 0.5) * ((BOX_D - 2*PD)/2));
+    g.add(reg(slab, 'Ballast Slab', '40x40x6cm (inside)', new THREE.Vector3(0, 0.6, 0)));
+  }
+  // Liner (semi-transparent box above shelf)
+  const linerH = BOX_H - SHELF_Y - SHELF_T - 0.02;
+  const liner = mkBox(BOX_W - 2*PW - 0.005, linerH, BOX_D - 2*PD - 0.005, MAT.liner);
+  liner.position.set(cx, baseY + SHELF_Y + SHELF_T + linerH/2 + 0.01, 0);
+  g.add(reg(liner, 'Plastic Liner', '0.2mm plastfolie', new THREE.Vector3(0, 0.3, 0)));
+  return g;
+}
+
+function buildGroundAnchors() {
+  const g = new THREE.Group();
+  for (let side = -1; side <= 1; side += 2) {
+    const cx = side * PLANTER_X;
+    for (let zi = 0; zi < 2; zi++) {
+      // Spike in ground
+      const spike = mkBox(0.025, 0.40, 0.025, MAT.spike);
+      spike.position.set(cx + side * 0.32, -0.15, zi ? 0.25 : -0.25);
+      g.add(reg(spike, 'Ground Spike', '~40cm jordanker', new THREE.Vector3(0, -0.4, 0)));
+      // Wire from spike to frame
+      const wireLen = 0.35;
+      const wire = mkBox(0.004, wireLen, 0.004, MAT.wire);
+      wire.position.set(cx + side * 0.26, wireLen/2, zi ? 0.25 : -0.25);
+      wire.rotation.z = side * 0.4;
+      g.add(reg(wire, 'Steel Wire', '2mm wire', new THREE.Vector3(0, -0.3, 0)));
+    }
+  }
+  return g;
+}
+
+function buildGateFrame() {
+  const g = new THREE.Group();
+  const baseY = SLAB_H + 0.02; // 20mm ground clearance
+  const gateZ = BOX_D/2 + CLAD_T + 0.01; // in front of planters
+  const rW = PW, rD = PD;
+
+  // Vertical stiles
+  const hingeStile = mkBox(rW, GATE_H, rD, MAT.timber);
+  hingeStile.position.set(-GATE_W/2 + rW/2, baseY + GATE_H/2, gateZ);
+  g.add(reg(hingeStile, 'Hinge Stile', '45x95x1180mm', new THREE.Vector3(-0.6, 0, 0)));
+
+  const latchStile = mkBox(rW, GATE_H, rD, MAT.timber);
+  latchStile.position.set(GATE_W/2 - rW/2, baseY + GATE_H/2, gateZ);
+  g.add(reg(latchStile, 'Latch Stile', '45x95x1180mm', new THREE.Vector3(0.6, 0, 0)));
+
+  // Horizontal rails
+  const railLen = GATE_W - 2 * rW;
+  const topRail = mkBox(railLen, rW, rD, MAT.timberDk);
+  topRail.position.set(0, baseY + GATE_H - rW/2, gateZ);
+  g.add(reg(topRail, 'Gate Top Rail', `45x95x${Math.round(railLen*1000)}mm`, new THREE.Vector3(0, 0.5, 0)));
+
+  const botRail = mkBox(railLen, rW, rD, MAT.timberDk);
+  botRail.position.set(0, baseY + rW/2, gateZ);
+  g.add(reg(botRail, 'Gate Bottom Rail', `45x95x${Math.round(railLen*1000)}mm`, new THREE.Vector3(0, -0.4, 0)));
+
+  // Diagonal Z-brace
+  const dLen = Math.sqrt(GATE_W * GATE_W + GATE_H * GATE_H) * 0.82;
+  const dAngle = Math.atan2(GATE_H, GATE_W);
+  const brace = mkBox(dLen, rW * 0.8, rD * 0.7, MAT.timberLt);
+  brace.position.set(0, baseY + GATE_H/2, gateZ - 0.001);
+  brace.rotation.z = dAngle;
+  g.add(reg(brace, 'Z-Brace (Diagonal)', `45x95x~${Math.round(dLen*1000)}mm`, new THREE.Vector3(0, 0, -0.6)));
+
+  return g;
+}
+
+function buildGatePickets() {
+  const g = new THREE.Group();
+  const baseY = SLAB_H + 0.02;
+  const gateZ = BOX_D/2 + CLAD_T + 0.01 + PD/2 + PICKET_T/2;
+  const innerW = GATE_W - 2 * PW;
+  const spacing = innerW / N_PICKETS;
+
+  for (let i = 0; i < N_PICKETS; i++) {
+    const picket = mkBox(PICKET_W, GATE_H, PICKET_T, MAT.clad);
+    picket.position.set(
+      -GATE_W/2 + PW + spacing * (i + 0.5),
+      baseY + GATE_H/2,
+      gateZ
+    );
+    g.add(reg(picket, `Picket #${i+1}`, '16x100x1180mm', new THREE.Vector3(0, 0, 0.3 + i * 0.02)));
+  }
+  return g;
+}
+
+function buildGateHardware() {
+  const g = new THREE.Group();
+  const baseY = SLAB_H + 0.02;
+  const gateZ = BOX_D/2 + CLAD_T + 0.01 + PD + PICKET_T + 0.003;
+
+  // 3 T-hinges
+  [0.12, 0.50, 0.88].forEach((hy, idx) => {
+    // Hinge arm (on gate face)
+    const arm = mkBox(0.22, 0.028, 0.005, MAT.metal);
+    arm.position.set(-GATE_W/2 + PW + 0.10, baseY + hy * GATE_H, gateZ);
+    g.add(reg(arm, `T-Hinge #${idx+1}`, '300mm galvaniseret', new THREE.Vector3(-0.6, 0, 0.4)));
+    // Hinge pin (on planter post)
+    const pin = mkBox(0.005, 0.08, 0.028, MAT.metalDk);
+    pin.position.set(-GATE_W/2 - 0.005, baseY + hy * GATE_H, gateZ);
+    g.add(reg(pin, `Hinge Pin #${idx+1}`, 'Part of T-hinge', new THREE.Vector3(-0.8, 0, 0.4)));
+  });
+
+  // Stalddørsgreb (thumb latch) at adult height
+  const latch = mkBox(0.035, 0.12, 0.04, MAT.metal);
+  latch.position.set(GATE_W/2 - PW - 0.02, baseY + GATE_H * 0.85, gateZ + 0.01);
+  g.add(reg(latch, 'Stalddorsgreb (Latch)', 'Thumb latch, adult height', new THREE.Vector3(0.5, 0.2, 0.5)));
+
+  // Skudrigle (slide bolt) at bottom
+  const bolt = mkBox(0.15, 0.022, 0.028, MAT.metalDk);
+  bolt.position.set(GATE_W/2 - PW - 0.08, baseY + 0.07, gateZ + 0.005);
+  g.add(reg(bolt, 'Skudrigle (Slide Bolt)', '150mm, bottom lock', new THREE.Vector3(0.5, -0.3, 0.5)));
+
+  return g;
+}
+
+function buildSoil() {
+  const g = new THREE.Group();
+  const baseY = SLAB_H;
+  for (let side = -1; side <= 1; side += 2) {
+    const cx = side * PLANTER_X;
+    const soilH = BOX_H - SHELF_Y - SHELF_T - 0.08;
+    const soil = mkBox(BOX_W - 2*PW - 0.03, soilH, BOX_D - 2*PD - 0.03, MAT.soil);
+    soil.position.set(cx, baseY + SHELF_Y + SHELF_T + soilH/2 + 0.02, 0);
+    g.add(reg(soil, 'Potting Soil', '~40L plantejord', new THREE.Vector3(0, 0.5, 0)));
+  }
+  return g;
+}
+
+// ============================================================
+// BUILD ALL GEOMETRY
+// ============================================================
+function initGeometry() {
+  // Step 0: Foundation
+  const s0 = new THREE.Group();
+  s0.add(buildPlanterFoundation(-PLANTER_X));
+  s0.add(buildPlanterFoundation(PLANTER_X));
+  stepGroups.push(s0);
+
+  // Step 1: Posts
+  const s1 = new THREE.Group();
+  s1.add(buildPlanterPosts(-PLANTER_X));
+  s1.add(buildPlanterPosts(PLANTER_X));
+  stepGroups.push(s1);
+
+  // Step 2: Rails + brackets
+  const s2 = new THREE.Group();
+  s2.add(buildPlanterRails(-PLANTER_X));
+  s2.add(buildPlanterRails(PLANTER_X));
+  stepGroups.push(s2);
+
+  // Step 3: Shelf boards
+  const s3 = new THREE.Group();
+  s3.add(buildPlanterShelf(-PLANTER_X));
+  s3.add(buildPlanterShelf(PLANTER_X));
+  stepGroups.push(s3);
+
+  // Step 4: Cladding
+  const s4 = new THREE.Group();
+  s4.add(buildPlanterCladding(-PLANTER_X));
+  s4.add(buildPlanterCladding(PLANTER_X));
+  stepGroups.push(s4);
+
+  // Step 5: Liner + ballast
+  const s5 = new THREE.Group();
+  s5.add(buildPlanterLinerBallast(-PLANTER_X));
+  s5.add(buildPlanterLinerBallast(PLANTER_X));
+  stepGroups.push(s5);
+
+  // Step 6: Ground anchors
+  stepGroups.push(buildGroundAnchors());
+
+  // Step 7: Gate frame
+  stepGroups.push(buildGateFrame());
+
+  // Step 8: Gate pickets
+  stepGroups.push(buildGatePickets());
+
+  // Step 9: Hardware (hinges, latch, bolt)
+  stepGroups.push(buildGateHardware());
+
+  // Step 10: Soil
+  stepGroups.push(buildSoil());
+
+  // Add all groups to scene, initially hidden
+  stepGroups.forEach(g => { g.visible = false; scene.add(g); });
+
+  // Build ghost preview (all geometry at 8% opacity)
+  buildGhostPreview();
+}
+
+// Ghost preview — faint outline of the final build
+let ghostGroup;
+function buildGhostPreview() {
+  ghostGroup = new THREE.Group();
+  ghostGroup.visible = false;
+  stepGroups.forEach(sg => {
+    sg.traverse(child => {
+      if (child.isMesh) {
+        const clone = child.clone();
+        clone.material = MAT.ghost;
+        ghostGroup.add(clone);
+      }
+    });
+  });
+  scene.add(ghostGroup);
+}
+
+// ============================================================
+// STEP NAVIGATION
+// ============================================================
+let currentStep = -1;
+let animatingMeshes = [];
+
+function goToStep(n) {
+  n = Math.max(0, Math.min(STEPS.length - 1, n));
+  currentStep = n;
+
+  // Show/hide/dim groups
+  stepGroups.forEach((g, i) => {
+    g.visible = (i <= n);
+    g.traverse(child => {
+      if (child.isMesh && child.userData.baseMat) {
+        if (i < n) {
+          child.material = getDimMat(child.userData.baseMat);
+        } else if (i === n) {
+          child.material = child.userData.baseMat;
+        }
+      }
+    });
+  });
+
+  // Animate current step's meshes
+  animatingMeshes = [];
+  stepGroups[n].traverse(child => {
+    if (child.isMesh && child.userData.finalPos) {
+      child.userData.animT = 0;
+      const off = child.userData.fromOffset;
+      child.userData.startPos = child.userData.finalPos.clone().add(off);
+      child.position.copy(child.userData.startPos);
+      animatingMeshes.push(child);
+    }
+  });
+
+  // Camera
+  const cam = STEPS[n].camera;
+  targetSph.theta = cam.theta;
+  targetSph.phi = cam.phi;
+  targetSph.radius = cam.radius;
+  targetLookY = cam.lookY || 0.5;
+
+  // Update UI
+  updateStepUI();
+}
+
+function nextStep() { if (currentStep < STEPS.length - 1) goToStep(currentStep + 1); }
+function prevStep() { if (currentStep > 0) goToStep(currentStep - 1); }
+
+// Keyboard nav
+window.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextStep(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); prevStep(); }
+});
+
+// ============================================================
+// CAMERA
+// ============================================================
+let sph = { theta:0.7, phi:1.05, radius:6.5 };
+let targetSph = { theta:0.7, phi:1.05, radius:6.5 };
+let lookY = 0.5, targetLookY = 0.5;
+const lookAt = new THREE.Vector3(0, 0.5, 0);
+
+function updateCamera() {
+  sph.theta += (targetSph.theta - sph.theta) * 0.06;
+  sph.phi += (targetSph.phi - sph.phi) * 0.06;
+  sph.radius += (targetSph.radius - sph.radius) * 0.06;
+  lookY += (targetLookY - lookY) * 0.06;
+  lookAt.y = lookY;
+  camera.position.set(
+    lookAt.x + sph.radius * Math.sin(sph.phi) * Math.cos(sph.theta),
+    lookAt.y + sph.radius * Math.cos(sph.phi),
+    lookAt.z + sph.radius * Math.sin(sph.phi) * Math.sin(sph.theta)
+  );
+  camera.lookAt(lookAt);
+}
+
+function resetCamera() {
+  const cam = STEPS[Math.max(0, currentStep)].camera;
+  targetSph.theta = cam.theta; targetSph.phi = cam.phi; targetSph.radius = cam.radius;
+  targetLookY = cam.lookY || 0.5;
+}
+
+// Mouse/touch controls
+let isDrag = false, prevMouse = { x:0, y:0 };
+renderer.domElement.addEventListener('mousedown', e => { isDrag = true; prevMouse = { x:e.clientX, y:e.clientY }; });
+window.addEventListener('mouseup', () => { isDrag = false; });
+window.addEventListener('mousemove', e => {
+  if (isDrag) {
+    targetSph.theta -= (e.clientX - prevMouse.x) * 0.005;
+    targetSph.phi = Math.max(0.25, Math.min(Math.PI - 0.1, targetSph.phi + (e.clientY - prevMouse.y) * 0.005));
+    prevMouse = { x:e.clientX, y:e.clientY };
+  }
+  mouse.x = ((e.clientX - viewport.offsetLeft) / viewport.clientWidth) * 2 - 1;
+  mouse.y = -((e.clientY - viewport.offsetTop) / viewport.clientHeight) * 2 + 1;
+});
+renderer.domElement.addEventListener('wheel', e => {
+  targetSph.radius = Math.max(1.5, Math.min(12, targetSph.radius + e.deltaY * 0.003));
+});
+
+// Touch
+let touchDist = 0;
+renderer.domElement.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) { isDrag = true; prevMouse = { x:e.touches[0].clientX, y:e.touches[0].clientY }; }
+  else if (e.touches.length === 2) {
+    const dx = e.touches[0].clientX - e.touches[1].clientX, dy = e.touches[0].clientY - e.touches[1].clientY;
+    touchDist = Math.sqrt(dx*dx + dy*dy);
+  }
+  e.preventDefault();
+}, { passive:false });
+renderer.domElement.addEventListener('touchmove', e => {
+  if (e.touches.length === 1 && isDrag) {
+    targetSph.theta -= (e.touches[0].clientX - prevMouse.x) * 0.005;
+    targetSph.phi = Math.max(0.25, Math.min(Math.PI - 0.1, targetSph.phi + (e.touches[0].clientY - prevMouse.y) * 0.005));
+    prevMouse = { x:e.touches[0].clientX, y:e.touches[0].clientY };
+  } else if (e.touches.length === 2) {
+    const dx = e.touches[0].clientX - e.touches[1].clientX, dy = e.touches[0].clientY - e.touches[1].clientY;
+    const d = Math.sqrt(dx*dx + dy*dy);
+    targetSph.radius = Math.max(1.5, Math.min(12, targetSph.radius - (d - touchDist) * 0.01));
+    touchDist = d;
+  }
+  e.preventDefault();
+}, { passive:false });
+renderer.domElement.addEventListener('touchend', () => { isDrag = false; });
+
+// ============================================================
+// TOOLTIP (hover)
+// ============================================================
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2(-10, -10);
+let hoveredMesh = null;
+const tooltip = document.getElementById('tooltip');
+const ttName = tooltip.querySelector('.tt-name');
+const ttDim = tooltip.querySelector('.tt-dim');
+
+function updateTooltip(e) {
+  raycaster.setFromCamera(mouse, camera);
+  const visible = allMeshes.filter(m => {
+    let p = m.parent;
+    while (p) { if (!p.visible) return false; p = p.parent; }
+    return m.visible;
+  });
+  const hits = raycaster.intersectObjects(visible, false);
+
+  if (hoveredMesh && (!hits.length || hits[0].object !== hoveredMesh)) {
+    hoveredMesh.material = hoveredMesh.userData._currentMat || hoveredMesh.userData.baseMat;
+    hoveredMesh = null;
+    tooltip.style.display = 'none';
+  }
+  if (hits.length > 0) {
+    const o = hits[0].object;
+    if (o !== hoveredMesh && o.userData.name) {
+      hoveredMesh = o;
+      o.userData._currentMat = o.material;
+      o.material = MAT.highlight;
+      ttName.textContent = o.userData.name;
+      ttDim.textContent = o.userData.dim || '';
+      tooltip.style.display = 'block';
+    }
+  }
+  if (tooltip.style.display === 'block' && e) {
+    let tx = e.clientX + 14, ty = e.clientY - 8;
+    if (tx + 240 > window.innerWidth) tx = e.clientX - 250;
+    if (ty + 60 > window.innerHeight) ty = e.clientY - 70;
+    tooltip.style.left = tx + 'px'; tooltip.style.top = ty + 'px';
+  }
+}
+window.addEventListener('mousemove', updateTooltip);
+
+// ============================================================
+// UI UPDATES
+// ============================================================
+function updateStepUI() {
+  const s = STEPS[currentStep];
+
+  document.getElementById('step-num-label').textContent = `Step ${currentStep + 1} of ${STEPS.length}`;
+  document.getElementById('step-title').textContent = s.title;
+  document.getElementById('step-subtitle').textContent = s.subtitle;
+  document.getElementById('progress-bar').style.width = `${((currentStep + 1) / STEPS.length) * 100}%`;
+
+  // Build step body
+  let html = '';
+
+  // Materials
+  if (s.materials && s.materials.length) {
+    html += '<div class="section"><div class="section-title">Materials</div><ul class="materials-list">';
+    s.materials.forEach(m => { html += `<li><span>${m}</span></li>`; });
+    html += '</ul></div>';
+  }
+
+  // Tools
+  if (s.tools && s.tools.length) {
+    html += '<div class="section"><div class="section-title">Tools</div><ul class="tools-list">';
+    s.tools.forEach(t => { html += `<li><span>${t}</span></li>`; });
+    html += '</ul></div>';
+  }
+
+  // Instructions
+  if (s.instructions && s.instructions.length) {
+    html += '<div class="section"><div class="section-title">Instructions</div><ol class="instructions-list">';
+    s.instructions.forEach((inst, i) => {
+      html += `<li><span class="num">${i+1}.</span><span>${inst}</span></li>`;
+    });
+    html += '</ol></div>';
+  }
+
+  // Tip
+  if (s.tips) {
+    html += `<div class="section"><div class="tip-box"><strong>Tip:</strong> ${s.tips}</div></div>`;
+  }
+
+  document.getElementById('step-body').innerHTML = html;
+  document.getElementById('step-body').scrollTop = 0;
+
+  // Navigation buttons
+  document.getElementById('btn-prev').disabled = (currentStep <= 0);
+  const nextBtn = document.getElementById('btn-next');
+  nextBtn.disabled = (currentStep >= STEPS.length - 1);
+  nextBtn.textContent = currentStep >= STEPS.length - 1 ? 'Done!' : 'Next \u2192';
+
+  // Dots
+  updateDots();
+}
+
+function updateDots() {
+  const container = document.getElementById('step-dots');
+  container.innerHTML = '';
+  STEPS.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'dot';
+    if (i < currentStep) dot.classList.add('done');
+    if (i === currentStep) dot.classList.add('active');
+    dot.addEventListener('click', () => goToStep(i));
+    container.appendChild(dot);
+  });
+}
+
+// Ghost toggle
+let ghostVisible = false;
+function toggleGhost() {
+  ghostVisible = !ghostVisible;
+  ghostGroup.visible = ghostVisible;
+  document.getElementById('btn-ghost').textContent = 'Ghost: ' + (ghostVisible ? 'ON' : 'OFF');
+  document.getElementById('btn-ghost').classList.toggle('active', ghostVisible);
+}
+
+// Autoplay
+let autoplayInterval = null;
+function toggleAutoplay() {
+  if (autoplayInterval) {
+    clearInterval(autoplayInterval);
+    autoplayInterval = null;
+    document.getElementById('btn-autoplay').classList.remove('active');
+    document.getElementById('btn-autoplay').textContent = 'Auto-Play';
+  } else {
+    autoplayInterval = setInterval(() => {
+      if (currentStep < STEPS.length - 1) nextStep();
+      else toggleAutoplay(); // stop at end
+    }, 4000);
+    document.getElementById('btn-autoplay').classList.add('active');
+    document.getElementById('btn-autoplay').textContent = 'Playing...';
+  }
+}
+
+// ============================================================
+// ANIMATION EASING
+// ============================================================
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+function updateAnimations() {
+  animatingMeshes.forEach(m => {
+    if (m.userData.animT < 1) {
+      m.userData.animT = Math.min(1, m.userData.animT + 0.018);
+      const t = easeOutCubic(m.userData.animT);
+      m.position.lerpVectors(m.userData.startPos, m.userData.finalPos, t);
+    }
+  });
+}
+
+// ============================================================
+// RESIZE
+// ============================================================
+function onResize() {
+  const w = viewport.clientWidth, h = viewport.clientHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+}
+window.addEventListener('resize', onResize);
+
+// ============================================================
+// MAIN LOOP
+// ============================================================
+function animate() {
+  requestAnimationFrame(animate);
+  updateCamera();
+  updateAnimations();
+  renderer.render(scene, camera);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+initGeometry();
+onResize();
+goToStep(0);
+animate();
+</script>
+</body>
+</html>
