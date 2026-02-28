@@ -157,7 +157,7 @@
   <div id="ui-overlay">
     <div id="title-bar">
       <h1>Planter Box Gate</h1>
-      <p>Interactive 3D Build Plan — hover parts for details</p>
+      <p>3.5m span — 115cm planters + 120cm gate — hover for details</p>
     </div>
 
     <div id="controls">
@@ -202,10 +202,10 @@
 const container = document.getElementById('canvas-container');
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x1a1a1e);
-scene.fog = new THREE.Fog(0x1a1a1e, 8, 22);
+scene.fog = new THREE.Fog(0x1a1a1e, 10, 26);
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.01, 100);
-camera.position.set(3.5, 2.5, 4);
+camera.position.set(4.5, 3.0, 5);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -222,7 +222,7 @@ const dir = new THREE.DirectionalLight(0xfff5e0, 1.2);
 dir.position.set(5, 8, 4); dir.castShadow = true;
 dir.shadow.mapSize.set(2048,2048);
 dir.shadow.camera.near=0.1; dir.shadow.camera.far=20;
-dir.shadow.camera.left=-5; dir.shadow.camera.right=5;
+dir.shadow.camera.left=-6; dir.shadow.camera.right=6;
 dir.shadow.camera.top=5; dir.shadow.camera.bottom=-5;
 scene.add(dir);
 scene.add(new THREE.DirectionalLight(0xc0d0ff, 0.3).translateX(-3).translateY(4).translateZ(-2));
@@ -231,7 +231,7 @@ const rim = new THREE.PointLight(0xffddaa, 0.5, 10); rim.position.set(-2,3,3); s
 // Ground + grid
 const gnd = new THREE.Mesh(new THREE.PlaneGeometry(20,20), new THREE.MeshStandardMaterial({color:0x2a2a2e,roughness:0.95}));
 gnd.rotation.x = -Math.PI/2; gnd.position.y = -0.01; gnd.receiveShadow = true; scene.add(gnd);
-scene.add(new THREE.GridHelper(6, 30, 0x333338, 0x28282c));
+scene.add(new THREE.GridHelper(8, 40, 0x333338, 0x28282c));
 
 // ============================================================
 // MATERIALS
@@ -313,7 +313,7 @@ function registerPart(mesh, info) {
 function createPlanter(offsetX) {
   const g = new THREE.Group();
   g.position.x = offsetX;
-  const W=0.40, D=0.40, H=1.20, pW=0.045, pD=0.095;
+  const W=1.15, D=0.40, H=1.20, pW=0.045, pD=0.095;
   const bT=0.016, bW=0.10, platH=0.60;
   const side = offsetX > 0 ? 1 : -1;
   const tag = offsetX > 0 ? 'Right' : 'Left';
@@ -355,15 +355,18 @@ function createPlanter(offsetX) {
     }
   });
 
-  // Platform boards
-  for(let i=0;i<3;i++){
-    const bLen=W-2*pW-0.01, bWid=(D-2*pD-0.01)/3;
-    const m=new THREE.Mesh(new THREE.BoxGeometry(bLen,bT,bWid-0.005),M.timber);
-    m.position.set(0, platH+bT/2, -D/2+pD+bWid/2+0.005+i*bWid);
+  // Platform boards — span depth direction, tiled across width
+  const spanLen = D - 2*pD - 0.01;  // ~210mm depth span
+  const widthToFill = W - 2*pW - 0.01;  // ~1060mm width
+  const nShelfBoards = Math.round(widthToFill / 0.095);
+  const shelfSpacing = widthToFill / nShelfBoards;
+  for(let i=0;i<nShelfBoards;i++){
+    const m=new THREE.Mesh(new THREE.BoxGeometry(shelfSpacing-0.004,bT,spanLen),M.timber);
+    m.position.set(-widthToFill/2+shelfSpacing/2+i*shelfSpacing, platH+bT/2, 0);
     g.add(registerPart(m,{
-      name:'Shelf Board', desc:'Forskallingsbræt at 60cm. Drill drainage holes!', dim:'15×95×~310mm',
-      category:'platform', forceLabel: i===1,
-      explodedOffset:new THREE.Vector3(0, -0.2+i*0.06, 0),
+      name:'Shelf Board', desc:'Forskallingsbræt at 60cm. Drill drainage holes!', dim:'15×95×~210mm',
+      category:'platform', forceLabel: i===Math.floor(nShelfBoards/2),
+      explodedOffset:new THREE.Vector3(0, -0.2+i*0.02, 0),
     }));
   }
 
@@ -377,46 +380,54 @@ function createPlanter(offsetX) {
     explodedOffset:new THREE.Vector3(side*0.5, 0.3, 0),
   }));
 
-  // Rocks
-  const rm=new THREE.Mesh(new THREE.BoxGeometry(0.28,0.20,0.28),M.rocks);
-  rm.position.set(0, 0.15, 0);
-  g.add(registerPart(rm,{
-    name:'Ballast Slabs', desc:'Betonflise 40×40×6cm inside for weight. ~30kg per box.', dim:'2× 40×40×6cm',
-    category:'fill', forceLabel:true,
-    explodedOffset:new THREE.Vector3(0, -0.5, 0),
-  }));
+  // Ballast slabs (3 per planter, below shelf)
+  for(let bi=0;bi<3;bi++){
+    const rm=new THREE.Mesh(new THREE.BoxGeometry(0.38,0.06,D-2*pD-0.02),M.rocks);
+    rm.position.set((bi-1)*0.40, 0.03+0.06/2, 0);
+    g.add(registerPart(rm,{
+      name:'Ballast Slab', desc:'Betonflise 40×40×6cm inside for weight. ~45kg per box.', dim:'40×40×6cm',
+      category:'fill', forceLabel:bi===1,
+      explodedOffset:new THREE.Vector3(0, -0.5-bi*0.08, 0),
+    }));
+  }
 
   // Soil
   const sH=lH-0.02;
   const sm=new THREE.Mesh(new THREE.BoxGeometry(W-2*pW-0.02,sH,D-2*pD-0.02),M.soil);
   sm.position.set(0, platH+bT+sH/2+0.01, 0);
   g.add(registerPart(sm,{
-    name:'Potting Soil', desc:'Plantejord, 40cm deep. Plant herbs or flowers!', dim:'~40L per box',
+    name:'Potting Soil', desc:'Plantejord, 40cm deep. Plant herbs or flowers!', dim:'~120L per box',
     category:'fill', forceLabel:true,
     explodedOffset:new THREE.Vector3(0, 0.6, 0),
   }));
 
-  // Cladding
+  // Cladding — dynamic board count based on face width
   [{ax:'x',d:-1,f:'Front'},{ax:'x',d:1,f:'Back'},{ax:'z',d:-1,f:'Left Side'},{ax:'z',d:1,f:'Right Side'}].forEach(s=>{
-    for(let i=0;i<3;i++){
+    let faceWidth, nBoards;
+    if(s.ax==='x'){
+      faceWidth = D - 0.005;  // depth face ~400mm
+    } else {
+      faceWidth = W + bT*2;   // width face ~1150mm + cladding overlap
+    }
+    nBoards = Math.max(3, Math.round(faceWidth / 0.10));
+    const boardW = faceWidth / nBoards;
+    for(let i=0;i<nBoards;i++){
       let geo,px,pz,ex,ez;
       const py=H/2;
       if(s.ax==='x'){
-        const bLen=D-0.01;
-        geo=new THREE.BoxGeometry(bT,H,bLen/3-0.003);
-        px=s.d*(W/2+bT/2); pz=-bLen/2+(bLen/3)*(i+0.5);
+        geo=new THREE.BoxGeometry(bT,H,boardW-0.003);
+        px=s.d*(W/2+bT/2); pz=-faceWidth/2+boardW*(i+0.5);
         ex=s.d*0.4*side; ez=0;
       } else {
-        const bLen=W+bT*2;
-        geo=new THREE.BoxGeometry(bLen/3-0.003,H,bT);
-        pz=s.d*(D/2+bT/2); px=-bLen/2+(bLen/3)*(i+0.5);
+        geo=new THREE.BoxGeometry(boardW-0.003,H,bT);
+        pz=s.d*(D/2+bT/2); px=-faceWidth/2+boardW*(i+0.5);
         ez=s.d*0.4; ex=0;
       }
       const m=new THREE.Mesh(geo,M.clad);
       m.position.set(px,py,pz);
       g.add(registerPart(m,{
         name:`Cladding (${s.f})`, desc:`Imp. ru bræt 16×100mm, ${s.f.toLowerCase()}.`, dim:'16×100×1200mm',
-        category:'cladding', forceLabel: i===1,
+        category:'cladding', forceLabel: i===Math.floor(nBoards/2),
         explodedOffset:new THREE.Vector3(ex,0,ez),
       }));
     }
@@ -529,15 +540,15 @@ function createGate(){
 // ============================================================
 // BUILD
 // ============================================================
-createPlanter(-0.80);
-createPlanter(0.80);
+createPlanter(-1.175);
+createPlanter(1.175);
 createGate();
 
 // ============================================================
 // CAMERA CONTROLS
 // ============================================================
 let isDragging=false, prevM={x:0,y:0};
-let sph={theta:0.7,phi:1.1,radius:5.5};
+let sph={theta:0.7,phi:1.1,radius:7.0};
 let tSph={...sph};
 const lookAt=new THREE.Vector3(0,0.45,0);
 
@@ -709,7 +720,7 @@ function toggleLabels(){
   document.getElementById('btn-labels-toggle').classList.toggle('active', labelsVisible);
 }
 
-function resetCamera(){ tSph={theta:0.7,phi:1.1,radius:5.5}; }
+function resetCamera(){ tSph={theta:0.7,phi:1.1,radius:7.0}; }
 
 function updateExplosion(){
   expFactor+=(tExp-expFactor)*0.05;

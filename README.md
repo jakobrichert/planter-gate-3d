@@ -48,7 +48,7 @@ Each step shows:
 
 Dimensions based on a real shopping list from Danish hardware stores (Bauhaus, Silvan, Jem & Fix):
 
-- **2 planter boxes**: 40x40cm footprint, 120cm tall
+- **2 planter boxes**: 115x40cm footprint, 120cm tall
 - **1 gate**: ~120cm wide, hinged between the planters
 - **14 pickets** with <60mm gaps (toddler head-safe)
 - **Thumb latch** at adult height + **slide bolt** at the bottom
